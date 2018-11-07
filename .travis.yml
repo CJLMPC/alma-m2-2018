@@ -12,18 +12,26 @@ branches:
 before_install:
   - docker version
   - docker info
+  - node --version
+  - npm --version
 
 script:
+  - cd alma-server/src/main/resources
+  - pwd
+  - npm install -g gulp
+  - npm install
+  - gulp minify
+  - cd ../../../../
   - mvn clean verify -f alma-server/pom.xml -e
 
 after_success:
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
   - docker images
-  - docker push cjlmpc/alma-server:latest
+  - docker push ORGANIZATION_NAME/alma-server:latest
 
 deploy:
   provider: releases
-  api_key: 1c94fbea6466be82aad6d4d25c0e5c70c4494875
+  api_key: $GH_TOKEN
   file_glob: true
   file: directory/*
   skip_cleanup: true
